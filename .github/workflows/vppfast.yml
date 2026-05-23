@@ -1,12 +1,14 @@
-name: Build APK Fast
+name: Build APK Ultimate
 
 on:
   push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,8 +23,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          
-            - name: Install System Dependencies
+
+      - name: Install Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libmpfr-dev libmpc-dev lld
@@ -32,21 +34,14 @@ jobs:
           pip install --upgrade pip
           pip install cython==0.29.36 buildozer
 
-      - name: Accept Android SDK Licenses
+      - name: Build Android Debug APK
         run: |
-          mkdir -p ~/.buildozer
-          yes | buildozer android p4a --accept_sdk_license || true
-        env:
-          BUILDOZER_WARN_ON_ROOT: 0
-
-      - name: Run Buildozer Engine
-        run: buildozer android debug --quiet
-        env:
-          BUILDOZER_WARN_ON_ROOT: 0
+          buildozer android debug
+        # မှတ်ချက် - buildozer custom command များရှိက ဤနေရာတွင် လိုအပ်သလို ပြောင်းလဲနိုင်ပါသည်။
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
         with:
-          name: vppfast-apk
+          name: debug-apk
           path: bin/*.apk
           
