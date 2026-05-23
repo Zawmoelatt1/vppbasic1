@@ -40,7 +40,7 @@ jobs:
           BUILDOZER_WARN_ON_ROOT: 0
 
       - name: Run Buildozer Engine
-        run: buildozer android debug
+        run: buildozer android debug --quiet
         env:
           BUILDOZER_WARN_ON_ROOT: 0
 
@@ -49,3 +49,4 @@ jobs:
         with:
           name: vppfast-apk
           path: bin/*.apk
+          
