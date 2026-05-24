@@ -8,28 +8,31 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # === အဆင့် ၁ - Buildozer အတွက် လိုအပ်တဲ့ Dependencies တွေကို အရင်သွင်းပေးပါ ===
-    - name: Install Dependencies
+    # === အဆင့် ၁ - Python သတ်မှတ်ပေးခြင်း ===
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    # === အဆင့် ၂ - Buildozer အတွက် လိုအပ်သမျှ Linux Dependencies တွေအကုန်သွင်းခြင်း ===
+    - name: Install Buildozer Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
           build-essential ccache git libffi-dev libssl-dev \
-          python3-dev python3-pip python3-setuptools unzip zip
+          python3-dev python3-pip python3-setuptools unzip zip \
+          openjdk-17-jdk-headless target-cli-fb
+        pip install --upgrade pip
+        pip install buildozer cython
 
-    # === အဆင့် ၂ - Buildozer Action ကို run တဲ့အခါ auto-accept settings တွေ ထည့်ပေးလိုက်ပါ ===
-    - name: Build with Buildozer
-      uses: ArtemSBulgakov/buildozer-action@v1
-      env:
-        # Buildozer ရဲ့ အောက်က python-for-android အတွက် license လက်ခံခိုင်းခြင်း
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-        # စက်ထဲက သတ်မှတ်ချက်တွေအတွက်ပါ သေချာအောင် ထည့်ပေးခြင်း
-        ACCEPT_SDK_LICENSE: "y"
-        ANDROID_LOGTOSTDERR: "1"
-      with:
-        buildozer_version: stable
-        args: android debug
-        
-    - name: Upload APK
+    # === အဆင့် ၃ - 'yes' command ခံပြီး Buildozer ကို တိုက်ရိုက် run ခြင်း ===
+    - name: Build APK with Auto-Accept
+      run: |
+        # yes command က prompt တက်လာသမျှ (License အပါအဝင်) အကုန်လုံးကို automatic 'y' နှိပ်ပေးသွားမှာပါ
+        yes | buildozer android debug
+
+    # === အဆင့် ၄ - ထွက်လာတဲ့ APK ကို အောင်မြင်စွာ သိမ်းဆည်းခြင်း ===
+    - name: Upload APK Artifact
       uses: actions/upload-artifact@v3
       with:
         name: package
