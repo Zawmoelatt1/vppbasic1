@@ -1,4 +1,4 @@
-Name: Build Android APK
+name: Build Android APK
 
 on: [push]
 
@@ -7,14 +7,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
+    # === အဆင့် ၁ - Java environment ကို အရင်ပြင်ဆင်ပါ ===
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # === အဆင့် ၂ - Android SDK ကို သီးသန့်တင်ပြီး License တွေကို ရိုက်ထည့်ပေးလိုက်ပါ ===
+    - name: Accept Android SDK Licenses
+      run: |
+        sudo mkdir -p /usr/lib/android-sdk/licenses
+        yes | sudo sdkmanager --licenses || true
+
+    # === အဆင့် ၃ - ပြီးမှ Buildozer နဲ့ Build ပါ ===
     - name: Build with Buildozer
       uses: ArtemSBulgakov/buildozer-action@v1
-      # === ဒီနေရာမှာ SDK License ကို auto-accept လုပ်ဖို့ env ထည့်ပေးရပါမယ် ===
-      env:
-        ACCEPT_SDK_LICENSE: "y"
-        # တချို့ buildozer actions တွေအတွက် အောက်က variable လည်း လိုတတ်လို့ တစ်ခါတည်း တွဲထည့်ပေးထားပါတယ်
-        ANDROID_HOME: /usr/lib/android-sdk 
       with:
         buildozer_version: stable
         args: android debug
@@ -23,5 +32,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: package
-        path: .buildozer/android/platform/build-armeabi-v7a_arm64-v8a/dists/*/bin/*.apk
-        # မှတ်ချက် - Buildozer ရဲ့ APK အမှန်တကယ် ထွက်တဲ့လမ်းကြောင်း (path) သို့ ပြောင်းလဲထားပါသည်
+        path: bin/*.apk
+defaults:
+ 
