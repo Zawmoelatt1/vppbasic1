@@ -1,4 +1,4 @@
-name: Build Android APK
+Name: Build Android APK
 
 on: [push]
 
@@ -10,6 +10,11 @@ jobs:
     
     - name: Build with Buildozer
       uses: ArtemSBulgakov/buildozer-action@v1
+      # === ဒီနေရာမှာ SDK License ကို auto-accept လုပ်ဖို့ env ထည့်ပေးရပါမယ် ===
+      env:
+        ACCEPT_SDK_LICENSE: "y"
+        # တချို့ buildozer actions တွေအတွက် အောက်က variable လည်း လိုတတ်လို့ တစ်ခါတည်း တွဲထည့်ပေးထားပါတယ်
+        ANDROID_HOME: /usr/lib/android-sdk 
       with:
         buildozer_version: stable
         args: android debug
@@ -18,4 +23,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: package
-        path: bin/*.apk
+        path: .buildozer/android/platform/build-armeabi-v7a_arm64-v8a/dists/*/bin/*.apk
+        # မှတ်ချက် - Buildozer ရဲ့ APK အမှန်တကယ် ထွက်တဲ့လမ်းကြောင်း (path) သို့ ပြောင်းလဲထားပါသည်
